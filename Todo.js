@@ -8,7 +8,7 @@ const Todo = ({ todos, id, handleComplete, handleDelete }) => {
       <Text style={styles.text}>{todos.goal}</Text>
       <View style={styles.compilationContainer}>
       <Text style={styles.compilation}>
-        {todos.isCompleted ? "Completed" : "Not Completed"}
+        {todos.isCompleted ? "Completed" : "Uncompleted"}
       </Text>
       <TouchableOpacity
           style={todos.isCompleted ? styles.toggleGreen : styles.toggleRed}
@@ -16,7 +16,7 @@ const Todo = ({ todos, id, handleComplete, handleDelete }) => {
         />
       </View>
         <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(id)}>
-          <Entypo name="trash" size={24} color="black" />
+          <Entypo name="trash" size={20} color="black" />
         </TouchableOpacity>
       </View>
   );

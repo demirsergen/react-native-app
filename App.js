@@ -1,59 +1,84 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
   SafeAreaView,
-  Button
+  Button,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import Todo from "./Todo";
+
+const wait = (timeout) => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 
 export default function App() {
   const [text, setText] = useState("");
   const [todos, setTodos] = useState([]);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
   const handleComplete = (goal) => {
-    setTodos(todos.map((todo) => {
-      if (todo.goal === goal) {
-        return { ...todo, isCompleted: !todo.isCompleted };
-      }
-      return todo;
-    }));
-  }
+    setTodos(
+      todos.map((todo) => {
+        if (todo.goal === goal) {
+          return { ...todo, isCompleted: !todo.isCompleted };
+        }
+        return todo;
+      })
+    );
+  };
 
   const handleDelete = (index) => {
     const currentTodos = [...todos];
     currentTodos.splice(index, 1);
     setTodos(currentTodos);
-  }
-
+  };
 
   const handleSubmit = () => {
     if (text === "") {
-      alert('You must enter a todo.');
+      alert("You must enter a todo.");
       return;
-    } 
+    }
     setTodos([...todos, { goal: text, isCompleted: false }]);
     setText("");
   };
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.todosContainer}>
-      <Text style={styles.title}>Today's Todos</Text>
-        {todos?.map((todo,index) => (
-          <Todo key={index} todos={todo} handleComplete={handleComplete} handleDelete={handleDelete} id={index}/>
-        ))}
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          value={text}
-          style={styles.input}
-          onChangeText={text => setText(text)}
-          placeholder="Enter a todo..."
-        />
-        <Button style={styles.button} title="Add" onPress={handleSubmit} />
-      </View>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.todosContainer}>
+          <Text style={styles.title}>Today's Todos</Text>
+          {todos?.map((todo, index) => (
+            <Todo
+              key={index}
+              todos={todo}
+              handleComplete={handleComplete}
+              handleDelete={handleDelete}
+              id={index}
+            />
+          ))}
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={text}
+            style={styles.input}
+            onChangeText={(text) => setText(text)}
+            placeholder="Enter a todo..."
+          />
+          <Button style={styles.button} title="Add" onPress={handleSubmit} />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -64,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F7F7F7",
     margin: 0,
   },
-  title:{
+  title: {
     fontSize: 30,
     fontWeight: "bold",
   },
@@ -88,10 +113,10 @@ const styles = StyleSheet.create({
   },
   input: {
     padding: 10,
-    width: '70%',
+    width: "70%",
     color: "rgb(26,26,26)",
     flex: 1,
-    fontSize:16,
+    fontSize: 16,
   },
   button: {
     borderWidth: 1,
